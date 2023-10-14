@@ -1,0 +1,74 @@
+// Copyright (c) FIRST and other WPILib contributors.
+// Open Source Software; you can modify and/or share it under the terms of
+// the WPILib BSD license file in the root directory of this project.
+
+package frc.robot.autos;
+
+import edu.wpi.first.math.geometry.Rotation2d;
+import edu.wpi.first.math.geometry.Translation2d;
+import edu.wpi.first.math.kinematics.ChassisSpeeds;
+import edu.wpi.first.wpilibj.Timer;
+import edu.wpi.first.wpilibj.smartdashboard.SmartDashboard;
+import edu.wpi.first.wpilibj2.command.CommandBase;
+import frc.robot.subsystems.Pneumatics;
+import frc.robot.subsystems.Swerve;
+
+public class BalanceAuton extends CommandBase {
+  
+  Swerve swerveSubsystem;
+  Timer timer;
+  Pneumatics pneumaticsSubsystem;
+
+  public BalanceAuton(Swerve swerveSubsystem, Pneumatics pneumaticsSubsystem) {
+    this.swerveSubsystem = swerveSubsystem;
+    this.pneumaticsSubsystem = pneumaticsSubsystem;
+    //autonDriveCommand = new AutonDrive(swerveSubsystem, 3, .25, 0, 0); //TODO: determine these values
+    timer = new Timer();
+    addRequirements(swerveSubsystem, pneumaticsSubsystem);
+  }
+
+  // Called when the command is initially scheduled.
+  @Override
+  public void initialize() {
+    swerveSubsystem.stop();
+    timer.reset();
+    pneumaticsSubsystem.enableSubsystem();
+  }
+
+  boolean hasClimbedStation = false;
+  double timeToPass;
+
+  // Called every time the scheduler runs while the command is scheduled.
+  @Override
+  public void execute() {
+    SmartDashboard.putNumber("Pitch", swerveSubsystem.getGyroPitch());
+    SmartDashboard.putNumber("Roll", swerveSubsystem.getGyroRoll());
+    // if (!hasClimbedStation)
+    swerveSubsystem.drive(new Translation2d(4, 0), 0, true, true);
+    //swerveSubsystem.updateModules(new ChassisSpeeds(-.25, 0, 0), 1);
+
+    // if (swerveSubsystem.getGyroRoll() < -10 && !hasClimbedStation) {
+    //   hasClimbedStation = true;
+    //   timer.reset();
+    // } 
+
+    // if (swerveSubsystem.getGyroRoll() > -10 && hasClimbedStation) {
+    //   timeToPass = timer.get();
+    //   swerveSubsystem.drive(new Translation2d(-2, 0), 0, true, true);
+    // }
+
+    //if (timer.hasElapsed(timeToPass)) swerveSubsystem.stop();
+  }
+
+  // Called once the command ends or is interrupted.
+  @Override
+  public void end(boolean interrupted) {
+    swerveSubsystem.stop();
+  }
+
+  // Returns true when the command should end.
+  @Override
+  public boolean isFinished() {
+    return false;
+  }
+}

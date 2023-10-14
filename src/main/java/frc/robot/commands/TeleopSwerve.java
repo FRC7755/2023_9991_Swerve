@@ -42,21 +42,31 @@ public class TeleopSwerve extends CommandBase {
   public void execute() {
 
     double speedMultiplier = slowSpeedSup.getAsBoolean() ? 0.2 : 1.0;
-
+    double tIN = Math.abs(translationSup.getAsDouble()) < 0.15 ? 0 : translationSup.getAsDouble();
+    //double tIN = MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.Swerve.stickDeadband);
+    //tIN = tIN * tIN * tIN;
+    double sIN = Math.abs(strafeSup.getAsDouble()) < 0.15 ? 0 : strafeSup.getAsDouble();
+    //double sIN = MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.Swerve.stickDeadband);
+    //sIN = sIN * sIN * sIN;
+    double rIN = Math.abs(rotationSup.getAsDouble()) < 0.15 ? 0 : rotationSup.getAsDouble();
+    //double rIN = MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.Swerve.stickDeadband);
+    //rIN = rIN * rIN * rIN;
     /* Get Values, Deadband*/
     double translationVal =
         translationLimiter.calculate(
             speedMultiplier *
-            MathUtil.applyDeadband(translationSup.getAsDouble(), Constants.Swerve.stickDeadband));
+            tIN);
     double strafeVal =
         strafeLimiter.calculate(
             speedMultiplier *
-            MathUtil.applyDeadband(strafeSup.getAsDouble(), Constants.Swerve.stickDeadband));
+            sIN);
     double rotationVal =
         rotationLimiter.calculate(
             speedMultiplier *
-            MathUtil.applyDeadband(rotationSup.getAsDouble(), Constants.Swerve.stickDeadband));
-
+            rIN);
+    //translationVal = translationVal * translationVal * translationVal;
+    //strafeVal = strafeVal * strafeVal * strafeVal;
+    //rotationVal = rotationVal * rotationVal * rotationVal;
 
     /* Drive */
     s_Swerve.drive(

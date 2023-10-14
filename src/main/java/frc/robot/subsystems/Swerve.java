@@ -46,6 +46,13 @@ public class Swerve extends SubsystemBase {
     SmartDashboard.putData("Field", field);
   }
 
+  public float getGyroPitch() {
+    return gyro.getPitch();
+  }
+  public float getGyroRoll() {
+    return gyro.getRoll();
+  }
+
   public void drive(
       Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
     SwerveModuleState[] swerveModuleStates =
@@ -59,6 +66,9 @@ public class Swerve extends SubsystemBase {
     for (SwerveModule mod : mSwerveMods) {
       mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
     }
+  }
+  public void stop() {
+    drive(new Translation2d(), 0, false, false);
   }
 
   /* Used by SwerveControllerCommand in Auto */
@@ -74,6 +84,7 @@ public class Swerve extends SubsystemBase {
     SmartDashboard.putNumber("pose X", swerveOdometry.getPoseMeters().getX());
     SmartDashboard.putNumber("pose Y", swerveOdometry.getPoseMeters().getY());
     SmartDashboard.putNumber("gyro angle", gyro.getAngle());
+   
     return swerveOdometry.getPoseMeters();
   }
 
@@ -113,6 +124,7 @@ public class Swerve extends SubsystemBase {
   public void periodic() {
     swerveOdometry.update(getYaw(), getPositions());
     field.setRobotPose(getPose());
+     SmartDashboard.putNumber("GyroRoll", getGyroRoll());
 
     for (SwerveModule mod : mSwerveMods) {
       SmartDashboard.putNumber(

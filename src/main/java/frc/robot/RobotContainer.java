@@ -5,7 +5,7 @@
 package frc.robot;
 
 import edu.wpi.first.wpilibj.GenericHID;
-import edu.wpi.first.wpilibj.Joystick;
+//import edu.wpi.first.wpilibj.Joystick;
 import edu.wpi.first.wpilibj.XboxController;
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
@@ -13,6 +13,8 @@ import edu.wpi.first.wpilibj2.command.button.JoystickButton;
 import frc.robot.autos.*;
 import frc.robot.commands.*;
 import frc.robot.subsystems.*;
+import frc.robot.subsystems.Pneumatics;
+import edu.wpi.first.wpilibj.PneumaticsControlModule;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -21,8 +23,10 @@ import frc.robot.subsystems.*;
  * subsystems, commands, and button mappings) should be declared here.
  */
 public class RobotContainer {
+  private final Pneumatics pneumaticsSubsystem = new Pneumatics(new PneumaticsControlModule(0));
+  private final IntakeCommand intakeCommand;
   /* Controllers */
-  private final Joystick driver = new Joystick(0);
+  private final XboxController driver = new XboxController(0);
 
   /* Drive Controls */
   private final int translationAxis = XboxController.Axis.kLeftY.value;
@@ -33,10 +37,10 @@ public class RobotContainer {
   private final JoystickButton zeroGyro =
       new JoystickButton(driver, XboxController.Button.kY.value);
   private final JoystickButton robotCentric =
-      new JoystickButton(driver, XboxController.Button.kLeftBumper.value);
+      new JoystickButton(driver, XboxController.Button.kA.value);
 
   private final JoystickButton slowSpeed =
-      new JoystickButton(driver, XboxController.Button.kRightBumper.value);
+      new JoystickButton(driver, XboxController.Button.kB.value);
 
   /* Subsystems */
   private final Swerve s_Swerve = new Swerve();
@@ -52,6 +56,17 @@ public class RobotContainer {
             () -> robotCentric.getAsBoolean(),
             () -> slowSpeed.getAsBoolean()));
 
+            intakeCommand = new IntakeCommand(
+              pneumaticsSubsystem, 
+              () -> driver.getLeftBumperPressed(),
+              () -> driver.getLeftBumperReleased(),
+        //      () -> driverController.getAButton(),
+        //      () -> driverController.getBButton(),
+        //      () -> driverController.getYButton(),
+              () -> driver.getRightBumperPressed(),
+              () -> driver.getRightBumperReleased());
+      pneumaticsSubsystem.setDefaultCommand(intakeCommand);
+             
     // Configure the button bindings
     configureButtonBindings();
   }
@@ -74,7 +89,7 @@ public class RobotContainer {
    */
   public Command getAutonomousCommand() {
     // An ExampleCommand will run in autonomous
-    return null;
-    // return new DropPushExit(s_Swerve);
+    return new MobilityBalanceLow(s_Swerve, pneumaticsSubsystem);
+    // return new BalanceAuto(s_Swerve);
   }
 }
